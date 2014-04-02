@@ -151,8 +151,6 @@ $RECYCLE.BIN/
 .DS_Store
 
 .nuget/nuget.exe
-[Pp]ackages/
-
+#[Pp]ackages/
 
 pingme.txt
-DataSorter2/.nuget/NuGet.exe
