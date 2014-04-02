@@ -5,11 +5,6 @@ using SimpleInjector;
 
 namespace WpfApplication3
 {
-    public interface IDialogService
-    {
-        void ShowADialog(string message);
-    }
-
     public class CompositionRoot
     {
         private readonly Container _container;
@@ -20,24 +15,21 @@ namespace WpfApplication3
 
             SetupContainer(_container);
 
+            
+
             RxApp.MutableResolver.RegisterConstant(new ViewResolver(), typeof (IViewLocator));
             RxApp.MutableResolver.Register(() => new TestView(), typeof (IViewFor<ITestViewModel>));
         }
 
         private static void SetupContainer(Container container)
         {
-            container.RegisterSingle(() => new DialogShower(container.GetInstance<MainWindow>()));
+            container.Register<IViewFor<IDialogViewModel<Answer>>, DialogView>();
+            container.RegisterSingle<IDialogShower>(() => new DialogShower(container.GetInstance<MainWindow>()));
             container.RegisterSingle<IDialogService, DialogService>();
             container.RegisterSingle<ITestViewModelFactory, TestViewModelFactory>();
-            container.Register<IRoutingState, RoutingState>();
+            container.RegisterSingle<IRoutingState, RoutingState>();
             container.RegisterSingle<AppBootstrapper>();
-            container.RegisterSingle(() =>
-                               {
-                                   var w = new MainWindow {
-                                                              DataContext = container.GetInstance<AppBootstrapper>()
-                                                          };
-                                   return w;
-                               });
+            container.RegisterSingle<MainWindow>();
 
             container.Verify();
         }
@@ -45,21 +37,26 @@ namespace WpfApplication3
         private class DialogService : IDialogService
         {
             private readonly Container _container;
+            private readonly IDialogShower _dialogShower;
 
-            public DialogService(Container container)
+            public DialogService(Container container, IDialogShower dialogShower)
             {
                 _container = container;
+                _dialogShower = dialogShower;
             }
 
-            public void ShowADialog(string message)
+            public Answer ShowDialogFor(IDialogViewModel<Answer> viewModel)
             {
-                _container.GetInstance<DialogShower>().ShowADialog(message);
+                var view = _container.GetInstance<IViewFor<IDialogViewModel<Answer>>>();
+                return _dialogShower.ShowDialog(view, viewModel);
             }
         }
 
         public Window GetMainWindow()
         {
-            return _container.GetInstance<MainWindow>();
+            var mainWindow = _container.GetInstance<MainWindow>();
+            mainWindow.DataContext = _container.GetInstance<AppBootstrapper>();
+            return mainWindow;
         }
 
         private class AppBootstrapper : ReactiveObject, IScreen

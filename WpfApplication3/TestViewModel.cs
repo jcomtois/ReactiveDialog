@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Windows.Markup;
 using ReactiveUI;
 
 namespace WpfApplication3
@@ -15,7 +18,7 @@ namespace WpfApplication3
         private readonly ReactiveCommand _showDialogCommand;
         private string _hello;
         private string _rando;
-
+        
         public TestViewModel(IDialogService dialogService)
         {
             _dialogService = dialogService;
@@ -26,10 +29,16 @@ namespace WpfApplication3
                 this.WhenAny(x => x.Hello,
                              h => !string.IsNullOrWhiteSpace(h.Value)));
 
+            var dialog2Command = new ReactiveCommand();
+            dialog2Command
+                .OfType<Answer>()
+                .Where(a => a == Answer.Ok)
+                .Subscribe(o => _dialogService.ShowInformation("Did it"));
+
             _showDialogCommand.Subscribe(x =>
                                          {
                                              Hello = null;
-                                             _dialogService.ShowADialog("Hello");
+                                             dialog2Command.Execute(_dialogService.ShowInformation("Do it to it"));
                                          });
 
             _counter = new ObservableAsPropertyHelper<int>(Observable.Generate(0, i => true, i => i + 1, i => i, i => TimeSpan.FromSeconds(.01)),

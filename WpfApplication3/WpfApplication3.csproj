@@ -34,7 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>WpfApplication3.ProgramEntry</StartupObject>
+    <StartupObject>WpfApplication3.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ReactiveUI">
@@ -54,6 +54,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Reactive.Core">
       <HintPath>..\packages\Rx-Core.2.1.30214.0\lib\Net45\System.Reactive.Core.dll</HintPath>
     </Reference>
@@ -87,6 +88,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Answer.cs" />
+    <Compile Include="DialogServiceExtensions.cs" />
+    <Compile Include="DoubleScaler.cs" />
+    <Compile Include="IDialogService.cs" />
+    <Compile Include="StockUserErrorIconToSystemIconConverter.cs" />
     <Compile Include="CompositionRoot.cs" />
     <Compile Include="DialogShower.cs" />
     <Compile Include="DialogView.xaml.cs">
@@ -94,7 +99,6 @@
     </Compile>
     <Compile Include="DialogViewModel.cs" />
     <Compile Include="IDialogViewModel.cs" />
-    <Compile Include="ProgramEntry.cs" />
     <Compile Include="RecoveryCommandDecorator.cs" />
     <Compile Include="TestView.xaml.cs" />
     <Compile Include="TestViewModel.cs" />

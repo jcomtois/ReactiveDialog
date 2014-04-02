@@ -6,7 +6,6 @@
          <ResourceDictionary>
              <ResourceDictionary.MergedDictionaries>
                  <ResourceDictionary>
-                     <wpfApplication3:CompositionRoot x:Key="CompositionRoot" />
                  </ResourceDictionary>
              </ResourceDictionary.MergedDictionaries>
          </ResourceDictionary>

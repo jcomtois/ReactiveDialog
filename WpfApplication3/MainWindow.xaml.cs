@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace WpfApplication3
 {
@@ -10,6 +11,13 @@ namespace WpfApplication3
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private Guid guid = Guid.NewGuid();
+
+        public override string ToString()
+        {
+            return guid.ToString();
         }
     }
 }
