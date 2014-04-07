@@ -89,7 +89,7 @@ namespace WpfApplication3
 
         public StockUserErrorIcon Icon { get; set; }
 
-        private IEnumerable<RecoveryCommandDecorator<Answer>> CreateCommands(IEnumerable<Answer> possibleAnswers)
+        private static IEnumerable<RecoveryCommandDecorator<Answer>> CreateCommands(IEnumerable<Answer> possibleAnswers)
         {
             var list = new List<RecoveryCommandDecorator<Answer>>();
 
@@ -123,6 +123,16 @@ namespace WpfApplication3
                     case Answer.Abort:
                         command = new RecoveryCommandDecorator<Answer>(new RecoveryCommand(Answer.Abort.ToString(),
                                                                                            o => RecoveryOptionResult.FailOperation));
+                        break;
+                    case Answer.Yes:
+                        command = new RecoveryCommandDecorator<Answer>(new RecoveryCommand(Answer.Yes.ToString())
+                                                                       {IsDefault = true});
+                        break;
+                    case Answer.No:
+                        command =
+                            new RecoveryCommandDecorator<Answer>(new RecoveryCommand(Answer.No.ToString(),
+                                                                                     o => RecoveryOptionResult.CancelOperation)
+                                                                 {IsCancel = true});
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

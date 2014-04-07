@@ -5,6 +5,8 @@ namespace WpfApplication3
         Cancel = 0,
         Ok,
         Retry,
-        Abort
+        Abort,
+        Yes,
+        No
     }
 }
