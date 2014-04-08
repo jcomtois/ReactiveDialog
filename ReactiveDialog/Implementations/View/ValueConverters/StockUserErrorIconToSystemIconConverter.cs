@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Globalization;
 using System.Windows;
@@ -7,10 +7,10 @@ using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using ReactiveUI;
 
-namespace WpfApplication3
+namespace ReactiveDialog.Implementations.View.ValueConverters
 {
     /// <summary>
-    /// Converts a DialogType to the corresponding system icon.
+    /// Converts a StockUserErrorIcon to the corresponding system icon.
     /// </summary>
     [ValueConversion(typeof (StockUserErrorIcon), typeof (BitmapSource))]
     public class StockUserErrorIconToSystemIconConverter : IValueConverter

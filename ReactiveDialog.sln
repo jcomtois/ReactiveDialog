@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApplication3", "WpfApplication3\WpfApplication3.csproj", "{697C9AF0-9C2D-451F-A8B9-0F69EA3A547E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveDialogTesting", "ReactiveDialogTesting\ReactiveDialogTesting.csproj", "{697C9AF0-9C2D-451F-A8B9-0F69EA3A547E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReactiveDialog", "ReactiveDialog\ReactiveDialog.csproj", "{1F0B3650-01DD-4782-8951-72EB8FBB99B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +15,10 @@ Global
 		{697C9AF0-9C2D-451F-A8B9-0F69EA3A547E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{697C9AF0-9C2D-451F-A8B9-0F69EA3A547E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{697C9AF0-9C2D-451F-A8B9-0F69EA3A547E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F0B3650-01DD-4782-8951-72EB8FBB99B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F0B3650-01DD-4782-8951-72EB8FBB99B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F0B3650-01DD-4782-8951-72EB8FBB99B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F0B3650-01DD-4782-8951-72EB8FBB99B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

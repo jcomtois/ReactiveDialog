@@ -2,7 +2,7 @@
 using System.Windows;
 using ReactiveUI;
 
-namespace WpfApplication3
+namespace ReactiveDialog.Implementations
 {
     public class DialogShower : IDialogShower
     {
@@ -35,17 +35,8 @@ namespace WpfApplication3
 
             dialog.Owner = _parent;
             dialog.ShowDialog();
-           
+
             return viewModel.Response;
         }
-    }
-
-    public interface IDialogShower : IDialogShower<Answer>
-    {
-    }
-
-    public interface IDialogShower <T> where T : struct
-    {
-        T ShowDialog(IViewFor<IDialogViewModel<T>> view, IDialogViewModel<T> viewModel);
     }
 }

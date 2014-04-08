@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ReactiveUI;
 
-namespace WpfApplication3
+namespace ReactiveDialog
 {
     public interface IDialogViewModel <T> where T : struct
     {

@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using ReactiveUI;
 
-namespace WpfApplication3
+namespace ReactiveDialog.Decorators
 {
     public class RecoveryCommandDecorator <T> : IRecoveryCommand
         where T : struct

@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using ReactiveDialog.Decorators;
 using ReactiveUI;
 
-namespace WpfApplication3
+namespace ReactiveDialog.Implementations
 {
     public class DialogViewModel : ReactiveObject, IDialogViewModel<Answer>
     {

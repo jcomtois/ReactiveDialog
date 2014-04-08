@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using ReactiveUI;
+﻿using ReactiveUI;
 
 namespace WpfApplication3
 {

@@ -1,4 +1,4 @@
-﻿namespace WpfApplication3
+﻿namespace ReactiveDialog
 {
     public interface IDialogService : IDialogService<Answer>
     {

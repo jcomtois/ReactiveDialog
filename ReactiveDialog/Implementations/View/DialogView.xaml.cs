@@ -6,12 +6,12 @@ using System.Reactive.Linq;
 using System.Windows;
 using ReactiveUI;
 
-namespace WpfApplication3
+namespace ReactiveDialog.Implementations.View
 {
     /// <summary>
     /// Interaction logic for DialogView.xaml
     /// </summary>
-    public partial class DialogView : Window, IViewFor<IDialogViewModel<Answer>>
+    public partial class DialogView : IViewFor<IDialogViewModel<Answer>>
     {
         public static readonly DependencyProperty ViewModelProperty =
             DependencyProperty.Register("ViewModel",
@@ -23,7 +23,9 @@ namespace WpfApplication3
                                                                                                   "TextScale",
                                                                                                   typeof (double),
                                                                                                   typeof (DialogView),
-                                                                                                  new PropertyMetadata(FontSizeProperty.DefaultMetadata.DefaultValue));
+                                                                                                  new PropertyMetadata(
+                                                                                                      FontSizeProperty.DefaultMetadata.DefaultValue));
+
         private bool _canClose;
         private ReactiveCommand _playErrorSound;
 
@@ -33,7 +35,7 @@ namespace WpfApplication3
                 .Subscribe(vm =>
                            {
                                _playErrorSound = new ReactiveCommand();
-                              
+
                                if (vm == null)
                                {
                                    _canClose = true;
@@ -47,9 +49,9 @@ namespace WpfApplication3
 
                                var canCloseChanged = vm.WhenAnyValue(v => v.CanClose);
                                canCloseChanged.Subscribe(b =>
-                               {
-                                   _canClose = b;
-                               });
+                                                         {
+                                                             _canClose = b;
+                                                         });
 
                                if (vm.Message.Length < 100)
                                {
@@ -59,7 +61,6 @@ namespace WpfApplication3
                                {
                                    ClearValue(TextScaleProperty);
                                }
-
                            });
 
             InitializeComponent();

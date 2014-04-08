@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using ReactiveDialog.Implementations;
 using ReactiveUI;
 
-namespace WpfApplication3
+namespace ReactiveDialog
 {
     public static class DialogServiceExtensions
     {
@@ -80,79 +81,79 @@ namespace WpfApplication3
         }
 
         public static Answer ShowWarning(this IDialogService service,
-                                            string message)
+                                         string message)
         {
-            return ShowWarning(service, message, new[] { Answer.Ok });
+            return ShowWarning(service, message, new[] {Answer.Ok});
         }
 
         public static Answer ShowWarning(this IDialogService service,
-                                             string message,
-                                             IEnumerable<Answer> possibleAnswers)
+                                         string message,
+                                         IEnumerable<Answer> possibleAnswers)
         {
             return ShowWarning(service, message, "Warning", possibleAnswers);
         }
 
         public static Answer ShowWarning(this IDialogService service,
-                                             string message,
-                                             string caption)
+                                         string message,
+                                         string caption)
         {
-            return ShowWarning(service, message, caption, new[] { Answer.Ok });
+            return ShowWarning(service, message, caption, new[] {Answer.Ok});
         }
 
         public static Answer ShowError(this IDialogService service,
-                                         string message,
-                                         string caption,
-                                         IEnumerable<Answer> possibleAnswers)
+                                       string message,
+                                       string caption,
+                                       IEnumerable<Answer> possibleAnswers)
         {
             return PerformDialogDisplay(service, message, caption, possibleAnswers, StockUserErrorIcon.Error);
         }
 
         public static Answer ShowError(this IDialogService service,
-                                            string message)
+                                       string message)
         {
-            return ShowError(service, message, new[] { Answer.Ok });
+            return ShowError(service, message, new[] {Answer.Ok});
         }
 
         public static Answer ShowError(this IDialogService service,
-                                             string message,
-                                             IEnumerable<Answer> possibleAnswers)
+                                       string message,
+                                       IEnumerable<Answer> possibleAnswers)
         {
             return ShowWarning(service, message, "Error", possibleAnswers);
         }
 
         public static Answer ShowError(this IDialogService service,
-                                             string message,
-                                             string caption)
+                                       string message,
+                                       string caption)
         {
-            return ShowError(service, message, caption, new[] { Answer.Ok });
+            return ShowError(service, message, caption, new[] {Answer.Ok});
         }
 
         public static Answer ShowQuestion(this IDialogService service,
-                                         string message,
-                                         string caption,
-                                         IEnumerable<Answer> possibleAnswers)
+                                          string message,
+                                          string caption,
+                                          IEnumerable<Answer> possibleAnswers)
         {
             return PerformDialogDisplay(service, message, caption, possibleAnswers, StockUserErrorIcon.Question);
         }
 
         public static Answer ShowQuestion(this IDialogService service,
-                                            string message)
+                                          string message)
         {
-            return ShowQuestion(service, message, new[] { Answer.Yes, Answer.No });
+            return ShowQuestion(service, message, new[] {Answer.Yes, Answer.No});
         }
 
         public static Answer ShowQuestion(this IDialogService service,
-                                             string message,
-                                             IEnumerable<Answer> possibleAnswers)
+                                          string message,
+                                          IEnumerable<Answer> possibleAnswers)
         {
             return ShowQuestion(service, message, "Question", possibleAnswers);
         }
 
         public static Answer ShowQuestion(this IDialogService service,
-                                             string message,
-                                             string caption)
+                                          string message,
+                                          string caption)
         {
-            return ShowQuestion(service, message, caption, new[] { Answer.Yes, Answer.No });
+            return ShowQuestion(service, message, caption, new[] {Answer.Yes, Answer.No});
         }
 
         public static Answer ShowException(this IDialogService service, Exception exception, string message = null)

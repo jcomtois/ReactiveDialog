@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using System.Windows;
+using ReactiveDialog;
+using ReactiveDialog.Implementations;
 using ReactiveUI;
 using SimpleInjector;
 
@@ -15,15 +17,13 @@ namespace WpfApplication3
 
             SetupContainer(_container);
 
-            
-
             RxApp.MutableResolver.RegisterConstant(new ViewResolver(), typeof (IViewLocator));
             RxApp.MutableResolver.Register(() => new TestView(), typeof (IViewFor<ITestViewModel>));
         }
 
         private static void SetupContainer(Container container)
         {
-            container.Register<IViewFor<IDialogViewModel<Answer>>, DialogView>();
+            container.Register<IViewFor<IDialogViewModel<Answer>>, ReactiveDialog.Implementations.View.DialogView>();
             container.RegisterSingle<IDialogShower>(() => new DialogShower(container.GetInstance<MainWindow>()));
             container.RegisterSingle<IDialogService, DialogService>();
             container.RegisterSingle<ITestViewModelFactory, TestViewModelFactory>();
