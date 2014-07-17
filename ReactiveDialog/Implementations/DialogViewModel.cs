@@ -31,11 +31,11 @@ namespace ReactiveDialog.Implementations
 
             var commands = CreateCommands(possibleAnswers).ToArray();
 
-            var observer = Observer.Create<RecoveryCommandDecorator<Answer>>(d => d.Subscribe(o =>
+            var observer = Observer.Create<RecoveryCommandDecorator<Answer>>(d => d.Subscribe(Observer.Create<Unit>(o =>
                                                                                               {
                                                                                                   Response = d.Response;
                                                                                                   CanClose = true;
-                                                                                              }));
+                                                                                              })));
             commands.Subscribe(observer);
             Responses = commands;
 
