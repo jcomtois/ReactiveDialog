@@ -1,4 +1,5 @@
 using System;
+using System.Reactive;
 using ReactiveUI;
 
 namespace ReactiveDialog.Decorators
@@ -55,7 +56,7 @@ namespace ReactiveDialog.Decorators
             }
         }
 
-        public IDisposable Subscribe(IObserver<object> observer)
+        public IDisposable Subscribe(IObserver<Unit> observer)
         {
             return _inner.Subscribe(observer);
         }
@@ -78,11 +79,6 @@ namespace ReactiveDialog.Decorators
             CanExecuteChanged = null;
         }
 
-        public IObservable<T1> RegisterAsync <T1>(Func<object, IObservable<T1>> asyncBlock)
-        {
-            return _inner.RegisterAsync(asyncBlock);
-        }
-
         public IObservable<bool> CanExecuteObservable
         {
             get
@@ -96,14 +92,6 @@ namespace ReactiveDialog.Decorators
             get
             {
                 return _inner.IsExecuting;
-            }
-        }
-
-        public bool AllowsConcurrentExecution
-        {
-            get
-            {
-                return _inner.AllowsConcurrentExecution;
             }
         }
 
