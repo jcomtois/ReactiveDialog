@@ -27,14 +27,14 @@ namespace ReactiveDialog.Implementations.View
                                                                                                       FontSizeProperty.DefaultMetadata.DefaultValue));
 
         private bool _canClose;
-        private ReactiveCommand _playErrorSound;
+        private ReactiveCommand<bool> _playErrorSound;
 
         public DialogView()
         {
             this.WhenAnyValue(t => t.ViewModel)
                 .Subscribe(vm =>
                            {
-                               _playErrorSound = new ReactiveCommand();
+                               _playErrorSound = ReactiveCommand.;
 
                                if (vm == null)
                                {
@@ -44,7 +44,7 @@ namespace ReactiveDialog.Implementations.View
 
                                _playErrorSound.OfType<bool>().Where(b => b).Subscribe(b => SystemSounds.Hand.Play());
 
-                               var observer = Observer.Create<IRecoveryCommand>(command => command.Subscribe(o => HandleCommand(command)));
+                               var observer = Observer.Create<RecoveryCommand>(command => command.Subscribe(o => HandleCommand(command)));
                                vm.Responses.Subscribe(observer);
 
                                var canCloseChanged = vm.WhenAnyValue(v => v.CanClose);
