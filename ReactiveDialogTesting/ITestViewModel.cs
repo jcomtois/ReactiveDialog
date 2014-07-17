@@ -5,8 +5,8 @@ namespace WpfApplication3
 {
     public interface ITestViewModel : IRoutableViewModel
     {
-        IReactiveCommand<Unit> ShowDialogCommand { get; }
-        IReactiveCommand<Unit> SayHelloCommand { get; }
+        IReactiveCommand<object> ShowDialogCommand { get; }
+        IReactiveCommand<object> SayHelloCommand { get; }
         string Hello { get; }
         int Counter { get; }
         string Rando { get; }

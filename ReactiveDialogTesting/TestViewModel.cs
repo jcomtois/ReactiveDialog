@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
+using System.Threading.Tasks;
 using ReactiveDialog;
 using ReactiveUI;
 
@@ -15,8 +16,8 @@ namespace WpfApplication3
         private readonly ObservableAsPropertyHelper<int> _counter;
 
         private readonly IDialogService _dialogService;
-        private readonly IReactiveCommand<Unit> _sayHelloCommand;
-        private readonly IReactiveCommand<Unit> _showDialogCommand;
+        private readonly IReactiveCommand<object> _sayHelloCommand;
+        private readonly IReactiveCommand<object> _showDialogCommand;
         private string _hello;
         private string _rando;
 
@@ -24,11 +25,24 @@ namespace WpfApplication3
         public TestViewModel(IDialogService dialogService)
         {
             _dialogService = dialogService;
-            _sayHelloCommand = ReactiveCommand.CreateAsyncObservable(_ => Observable.Return(Unit.Default));
-            _sayHelloCommand.Subscribe(_ => Hello = DateTime.UtcNow.ToLocalTime().ToString());
 
-            _showDialogCommand = ReactiveCommand.CreateAsyncObservable(this.WhenAnyValue(x => x.Hello, s => !string.IsNullOrWhiteSpace(s)),
-                                                                       _ => Observable.Return(Unit.Default));
+            var changeTime = ReactiveCommand.CreateAsyncObservable(_ => Observable.Return(DateTime.UtcNow.ToLocalTime().ToString()));
+            changeTime.Subscribe(s => Hello = s);
+
+            var asyncHelloCommand = ReactiveCommand.CreateAsyncTask(_ =>
+                                                                        Task.Run(() =>
+                                                                                 {
+                                                                                     Thread.Sleep(2000);
+                                                                                     Debug.WriteLine(Thread.CurrentThread.IsThreadPoolThread);
+                                                                                     return _random.NextDouble().ToString();
+                                                                                 }
+                                                                        ));
+
+            asyncHelloCommand.Subscribe(s => Rando = s);
+
+            _sayHelloCommand = ReactiveCommand.CreateCombined(new IReactiveCommand[]{changeTime, asyncHelloCommand});
+
+            _showDialogCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.Hello, s => !string.IsNullOrWhiteSpace(s)));
 
             var dialog2Command = ReactiveCommand.CreateAsyncObservable(o =>
                                                                        {
@@ -56,9 +70,9 @@ namespace WpfApplication3
 
             var b = true;
 
-
             _showDialogCommand.Subscribe(_ =>
-                                         {var asyncCommand = ReactiveCommand.CreateAsyncObservable(o =>
+                                         {
+                                             var asyncCommand = ReactiveCommand.CreateAsyncObservable(o =>
                                                                                                       {
                                                                                                           Hello = null;
                                                                                                           b = !b;
@@ -66,7 +80,9 @@ namespace WpfApplication3
                                                                                                           {
                                                                                                               throw (new InvalidOperationException("OOOOOOOO"));
                                                                                                           }
-                                                                                                          answer.OnNext(_dialogService.ShowInformation("Do it to it"));
+                                                                                                          answer.OnNext(
+                                                                                                                        _dialogService.ShowInformation(
+                                                                                                                                                       "Do it to it"));
                                                                                                           return Observable.Return(Unit.Default);
                                                                                                       });
                                              asyncCommand.ExecuteAsync().Subscribe();
@@ -77,20 +93,9 @@ namespace WpfApplication3
 
             _counter = new ObservableAsPropertyHelper<int>(Observable.Generate(0, i => true, i => i + 1, i => i, i => TimeSpan.FromSeconds(.01)),
                                                            i => this.RaisePropertyChanged("Counter"));
-
-            _sayHelloCommand.Subscribe(_ =>
-            {
-                var asyncCommand = ReactiveCommand.CreateAsyncObservable(o =>
-                {
-                    Thread.Sleep(2000);
-                    Rando = _random.NextDouble().ToString();
-                    return Observable.Return(Unit.Default);
-                });
-                asyncCommand.ExecuteAsync().Subscribe();
-            });
         }
 
-        public IReactiveCommand<Unit> ShowDialogCommand
+        public IReactiveCommand<object> ShowDialogCommand
         {
             get
             {
@@ -98,7 +103,7 @@ namespace WpfApplication3
             }
         }
 
-        public IReactiveCommand<Unit> SayHelloCommand
+        public IReactiveCommand<object> SayHelloCommand
         {
             get
             {
