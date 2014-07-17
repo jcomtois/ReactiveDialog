@@ -42,7 +42,7 @@ namespace ReactiveDialog.Implementations
             Icon = StockUserErrorIcon.Notice;
         }
 
-        public IEnumerable<IRecoveryCommand> Responses { get; private set; }
+        public IEnumerable<RecoveryCommand> Responses { get; private set; }
 
         public string Message
         {

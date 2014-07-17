@@ -5,7 +5,7 @@ namespace ReactiveDialog
 {
     public interface IDialogViewModel <T> where T : struct
     {
-        IEnumerable<IRecoveryCommand> Responses { get; }
+        IEnumerable<RecoveryCommand> Responses { get; }
         string Message { get; }
         string Caption { get; set; }
         T Response { get; }

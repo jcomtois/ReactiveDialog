@@ -1,11 +1,12 @@
-﻿using ReactiveUI;
+﻿using System.Reactive;
+using ReactiveUI;
 
 namespace WpfApplication3
 {
     public interface ITestViewModel : IRoutableViewModel
     {
-        ReactiveCommand ShowDialogCommand { get; }
-        ReactiveCommand SayHelloCommand { get; }
+        IReactiveCommand<Unit> ShowDialogCommand { get; }
+        IReactiveCommand<Unit> SayHelloCommand { get; }
         string Hello { get; }
         int Counter { get; }
         string Rando { get; }

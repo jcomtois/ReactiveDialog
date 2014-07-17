@@ -2,8 +2,10 @@
 using System.Windows;
 using ReactiveDialog;
 using ReactiveDialog.Implementations;
+using ReactiveDialog.Implementations.View;
 using ReactiveUI;
 using SimpleInjector;
+using Splat;
 
 namespace WpfApplication3
 {
@@ -17,21 +19,41 @@ namespace WpfApplication3
 
             SetupContainer(_container);
 
-            RxApp.MutableResolver.RegisterConstant(new ViewResolver(), typeof (IViewLocator));
-            RxApp.MutableResolver.Register(() => new TestView(), typeof (IViewFor<ITestViewModel>));
+            Locator.CurrentMutable.RegisterConstant(new ViewResolver(), typeof (IViewLocator));
+            Locator.CurrentMutable.Register(() => new TestView(), typeof (IViewFor<ITestViewModel>));
         }
 
         private static void SetupContainer(Container container)
         {
-            container.Register<IViewFor<IDialogViewModel<Answer>>, ReactiveDialog.Implementations.View.DialogView>();
+            container.Register<IViewFor<IDialogViewModel<Answer>>, DialogView>();
             container.RegisterSingle<IDialogShower>(() => new DialogShower(container.GetInstance<MainWindow>()));
             container.RegisterSingle<IDialogService, DialogService>();
             container.RegisterSingle<ITestViewModelFactory, TestViewModelFactory>();
-            container.RegisterSingle<IRoutingState, RoutingState>();
+            container.RegisterSingle<RoutingState>();
             container.RegisterSingle<AppBootstrapper>();
             container.RegisterSingle<MainWindow>();
 
             container.Verify();
+        }
+
+        public Window GetMainWindow()
+        {
+            var mainWindow = _container.GetInstance<MainWindow>();
+            mainWindow.DataContext = _container.GetInstance<AppBootstrapper>();
+            return mainWindow;
+        }
+
+        private class AppBootstrapper : ReactiveObject, IScreen
+        {
+            public AppBootstrapper(RoutingState routingState,
+                                   ITestViewModelFactory testViewModelFactory)
+            {
+                Router = routingState;
+                var vm = testViewModelFactory.Create(this);
+                Router.NavigateAndReset.Execute(vm);
+            }
+
+            public RoutingState Router { get; private set; }
         }
 
         private class DialogService : IDialogService
@@ -50,26 +72,6 @@ namespace WpfApplication3
                 var view = _container.GetInstance<IViewFor<IDialogViewModel<Answer>>>();
                 return _dialogShower.ShowDialog(view, viewModel);
             }
-        }
-
-        public Window GetMainWindow()
-        {
-            var mainWindow = _container.GetInstance<MainWindow>();
-            mainWindow.DataContext = _container.GetInstance<AppBootstrapper>();
-            return mainWindow;
-        }
-
-        private class AppBootstrapper : ReactiveObject, IScreen
-        {
-            public AppBootstrapper(IRoutingState routingState, 
-                ITestViewModelFactory testViewModelFactory)
-            {
-                Router = routingState;
-                var vm = testViewModelFactory.Create(this);
-                Router.NavigateAndReset.Execute(vm);
-            }
-
-            public IRoutingState Router { get; private set; }
         }
 
         public interface ITestViewModelFactory
@@ -101,10 +103,8 @@ namespace WpfApplication3
                 var ints = viewModel.GetType().GetInterfaces();
                 var found = ints.FirstOrDefault(i => i.Name.EndsWith(viewModel.GetType().Name));
                 var vf = typeof (IViewFor<>).MakeGenericType(found);
-                return (IViewFor)RxApp.MutableResolver.GetService(vf);
+                return (IViewFor)Locator.CurrentMutable.GetService(vf);
             }
         }
     }
-
-   
 }
