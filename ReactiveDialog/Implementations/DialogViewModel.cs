@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
-using ReactiveDialog.Decorators;
 using ReactiveUI;
 
 namespace ReactiveDialog.Implementations
 {
     public class DialogViewModel : ReactiveObject, IDialogViewModel<Answer>
     {
-        private readonly string _message;
         private bool _canClose;
         private string _caption;
         private Answer _response;
@@ -27,30 +23,28 @@ namespace ReactiveDialog.Implementations
                 throw new ArgumentNullException("possibleAnswers");
             }
 
-            _message = message;
+            Message = message;
 
             var commands = CreateCommands(possibleAnswers).ToArray();
 
-            var observer = Observer.Create<RecoveryCommandDecorator<Answer>>(d => d.Subscribe(o =>
-                                                                                              {
-                                                                                                  Response = d.Response;
-                                                                                                  CanClose = true;
-                                                                                              }));
-            commands.Subscribe(observer);
+            foreach (var c in commands)
+            {
+                var response = c.Response;
+                c.Subscribe(_ =>
+                            {
+                                Response = response;
+                                CanClose = true;
+                            });
+            }
+
             Responses = commands;
 
             Icon = StockUserErrorIcon.Notice;
         }
 
-        public IEnumerable<IRecoveryCommand> Responses { get; private set; }
+        public IEnumerable<RecoveryCommand> Responses { get; private set; }
 
-        public string Message
-        {
-            get
-            {
-                return _message;
-            }
-        }
+        public string Message { get; private set; }
 
         public string Caption
         {
@@ -90,9 +84,9 @@ namespace ReactiveDialog.Implementations
 
         public StockUserErrorIcon Icon { get; set; }
 
-        private static IEnumerable<RecoveryCommandDecorator<Answer>> CreateCommands(IEnumerable<Answer> possibleAnswers)
+        private static IEnumerable<RecoveryCommandWithResponse<Answer>> CreateCommands(IEnumerable<Answer> possibleAnswers)
         {
-            var list = new List<RecoveryCommandDecorator<Answer>>();
+            var list = new List<RecoveryCommandWithResponse<Answer>>();
 
             var possible = possibleAnswers.Distinct().ToArray();
 
@@ -103,37 +97,36 @@ namespace ReactiveDialog.Implementations
 
             foreach (var answer in possible)
             {
-                RecoveryCommandDecorator<Answer> command;
+                RecoveryCommandWithResponse<Answer> command;
                 switch (answer)
                 {
                     case Answer.Cancel:
                         command =
-                            new RecoveryCommandDecorator<Answer>(new RecoveryCommand(Answer.Cancel.ToString(),
-                                                                                     o => RecoveryOptionResult.CancelOperation)
-                                                                 {IsCancel = true}
-                                );
+                            new RecoveryCommandWithResponse<Answer>(Answer.Cancel.ToString(),
+                                                                    o => RecoveryOptionResult.CancelOperation)
+                            {IsCancel = true};
                         break;
                     case Answer.Ok:
-                        command = new RecoveryCommandDecorator<Answer>(new RecoveryCommand(Answer.Ok.ToString())
-                                                                       {IsDefault = true});
+                        command = new RecoveryCommandWithResponse<Answer>(Answer.Ok.ToString())
+                                  {IsDefault = true};
                         break;
                     case Answer.Retry:
-                        command = new RecoveryCommandDecorator<Answer>(new RecoveryCommand(Answer.Retry.ToString(),
-                                                                                           o => RecoveryOptionResult.RetryOperation));
+                        command = new RecoveryCommandWithResponse<Answer>(Answer.Retry.ToString(),
+                                                                          o => RecoveryOptionResult.RetryOperation);
                         break;
                     case Answer.Abort:
-                        command = new RecoveryCommandDecorator<Answer>(new RecoveryCommand(Answer.Abort.ToString(),
-                                                                                           o => RecoveryOptionResult.FailOperation));
+                        command = new RecoveryCommandWithResponse<Answer>(Answer.Abort.ToString(),
+                                                                          o => RecoveryOptionResult.FailOperation);
                         break;
                     case Answer.Yes:
-                        command = new RecoveryCommandDecorator<Answer>(new RecoveryCommand(Answer.Yes.ToString())
-                                                                       {IsDefault = true});
+                        command = new RecoveryCommandWithResponse<Answer>(Answer.Yes.ToString())
+                                  {IsDefault = true};
                         break;
                     case Answer.No:
                         command =
-                            new RecoveryCommandDecorator<Answer>(new RecoveryCommand(Answer.No.ToString(),
-                                                                                     o => RecoveryOptionResult.CancelOperation)
-                                                                 {IsCancel = true});
+                            new RecoveryCommandWithResponse<Answer>(Answer.No.ToString(),
+                                                                    o => RecoveryOptionResult.CancelOperation)
+                            {IsCancel = true};
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

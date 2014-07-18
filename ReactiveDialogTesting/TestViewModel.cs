@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
+using System.Threading.Tasks;
 using ReactiveDialog;
 using ReactiveUI;
 
@@ -14,8 +16,8 @@ namespace WpfApplication3
         private readonly ObservableAsPropertyHelper<int> _counter;
 
         private readonly IDialogService _dialogService;
-        private readonly ReactiveCommand _sayHelloCommand;
-        private readonly ReactiveCommand _showDialogCommand;
+        private readonly IReactiveCommand<object> _sayHelloCommand;
+        private readonly IReactiveCommand<object> _showDialogCommand;
         private string _hello;
         private string _rando;
 
@@ -23,24 +25,40 @@ namespace WpfApplication3
         public TestViewModel(IDialogService dialogService)
         {
             _dialogService = dialogService;
-            _sayHelloCommand = new ReactiveCommand();
-            _sayHelloCommand.Subscribe(x => Hello = DateTime.UtcNow.ToLocalTime().ToString());
 
-            _showDialogCommand = new ReactiveCommand(
-                this.WhenAny(x => x.Hello,
-                             h => !string.IsNullOrWhiteSpace(h.Value)));
+            var changeTime = ReactiveCommand.CreateAsyncObservable(_ => Observable.Return(DateTime.UtcNow.ToLocalTime().ToString()));
+            changeTime.Subscribe(s => Hello = s);
 
-            var dialog2Command = new ReactiveCommand();
+            var asyncHelloCommand = ReactiveCommand.CreateAsyncTask(_ =>
+                                                                        Task.Run(() =>
+                                                                                 {
+                                                                                     Thread.Sleep(2000);
+                                                                                     Debug.WriteLine(Thread.CurrentThread.IsThreadPoolThread);
+                                                                                     return _random.NextDouble().ToString();
+                                                                                 }
+                                                                        ));
 
-            dialog2Command
-                .OfType<Answer>()
-                .Where(a => a == Answer.Ok)
-                .Subscribe(o =>
-                           {
-                               throw new Exception("AAAAAAAAA");
-                           });
+            asyncHelloCommand.Subscribe(s => Rando = s);
 
-           
+            _sayHelloCommand = ReactiveCommand.CreateCombined(new IReactiveCommand[]{changeTime, asyncHelloCommand});
+
+            _showDialogCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.Hello, s => !string.IsNullOrWhiteSpace(s)));
+//
+//            var dialog2Command = ReactiveCommand.CreateAsyncObservable(o =>
+//                                                                       {
+//                                                                           if (o is Answer)
+//                                                                           {
+//                                                                               return Observable.Return((Answer)o);
+//                                                                           }
+//                                                                           return Observable.Empty<Answer>();
+//                                                                       });
+//
+//            dialog2Command
+//                .Where(a => a == Answer.Ok)
+//                .Subscribe(o =>
+//                           {
+//                               throw new Exception("AAAAAAAAA");
+//                           });
 
             //            _showDialogCommand.Subscribe(x =>
             //                                         {
@@ -48,36 +66,36 @@ namespace WpfApplication3
             //                                         });
 
             var answer = new Subject<Answer>();
-            answer
-                .Subscribe(o => _dialogService.ShowInformation("Hello"));
+            answer.Subscribe(o => _dialogService.ShowInformation("Hello"));
 
             var b = true;
 
-            _showDialogCommand.RegisterAsyncAction(o =>
+            _showDialogCommand.Subscribe(_ =>
                                          {
-                                             Hello = null;
-                                             b = !b;
-                                             if (b)
-                                             {
-                                                 throw (new InvalidOperationException("OOOOOOOO"));
-                                             }
-                                             answer.OnNext(_dialogService.ShowInformation("Do it to it"));
-                                         }, RxApp.MainThreadScheduler);
+                                             var asyncCommand = ReactiveCommand.CreateAsyncObservable(o =>
+                                                                                                      {
+                                                                                                          Hello = null;
+                                                                                                          b = !b;
+                                                                                                          if (b)
+                                                                                                          {
+                                                                                                              throw (new InvalidOperationException("OOOOOOOO"));
+                                                                                                          }
+                                                                                                          answer.OnNext(
+                                                                                                                        _dialogService.ShowQuestion(
+                                                                                                                                                       "Do it to it", "NEWWW CAPRION", new[]{Answer.Abort, Answer.Cancel, Answer.No, Answer.Ok, Answer.Retry, Answer.Yes, }));
+                                                                                                          return Observable.Return(Unit.Default);
+                                                                                                      });
+                                             asyncCommand.ExecuteAsync().Subscribe();
+                                         });
 
             _showDialogCommand.ThrownExceptions
-                         .Subscribe(ex => _dialogService.ShowException(ex, "message"));
-
+                              .Subscribe(ex => _dialogService.ShowException(ex, "message"));
+            
             _counter = new ObservableAsPropertyHelper<int>(Observable.Generate(0, i => true, i => i + 1, i => i, i => TimeSpan.FromSeconds(.01)),
-                                                           i => raisePropertyChanged("Counter"));
-
-            _sayHelloCommand.RegisterAsyncAction(o =>
-                                                 {
-                                                     Thread.Sleep(2000);
-                                                     Rando = _random.NextDouble().ToString();
-                                                 });
+                                                           i => this.RaisePropertyChanged("Counter"));
         }
 
-        public ReactiveCommand ShowDialogCommand
+        public IReactiveCommand<object> ShowDialogCommand
         {
             get
             {
@@ -85,7 +103,7 @@ namespace WpfApplication3
             }
         }
 
-        public ReactiveCommand SayHelloCommand
+        public IReactiveCommand<object> SayHelloCommand
         {
             get
             {
