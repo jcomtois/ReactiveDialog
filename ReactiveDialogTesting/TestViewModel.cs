@@ -81,8 +81,8 @@ namespace WpfApplication3
                                                                                                               throw (new InvalidOperationException("OOOOOOOO"));
                                                                                                           }
                                                                                                           answer.OnNext(
-                                                                                                                        _dialogService.ShowInformation(
-                                                                                                                                                       "Do it to it"));
+                                                                                                                        _dialogService.ShowQuestion(
+                                                                                                                                                       "Do it to it", "NEWWW CAPRION", new[]{Answer.Abort, Answer.Cancel, Answer.No, Answer.Ok, Answer.Retry, Answer.Yes, }));
                                                                                                           return Observable.Return(Unit.Default);
                                                                                                       });
                                              asyncCommand.ExecuteAsync().Subscribe();
