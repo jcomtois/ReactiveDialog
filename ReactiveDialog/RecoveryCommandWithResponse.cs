@@ -1,7 +1,7 @@
 using System;
 using ReactiveUI;
 
-namespace ReactiveDialog.Decorators
+namespace ReactiveDialog
 {
     public class RecoveryCommandWithResponse <T> : RecoveryCommand
         where T : struct

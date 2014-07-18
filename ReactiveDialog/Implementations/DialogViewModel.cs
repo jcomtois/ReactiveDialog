@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
-using ReactiveDialog.Decorators;
 using ReactiveUI;
 
 namespace ReactiveDialog.Implementations
 {
     public class DialogViewModel : ReactiveObject, IDialogViewModel<Answer>
     {
-        private readonly string _message;
         private bool _canClose;
         private string _caption;
         private Answer _response;
@@ -27,16 +23,20 @@ namespace ReactiveDialog.Implementations
                 throw new ArgumentNullException("possibleAnswers");
             }
 
-            _message = message;
+            Message = message;
 
             var commands = CreateCommands(possibleAnswers).ToArray();
 
-            var observer = Observer.Create<RecoveryCommandWithResponse<Answer>>(d => d.Subscribe(o =>
-                                                                                                 {
-                                                                                                     Response = d.Response;
-                                                                                                     CanClose = true;
-                                                                                                 }));
-            commands.Subscribe(observer);
+            foreach (var c in commands)
+            {
+                var response = c.Response;
+                c.Subscribe(_ =>
+                            {
+                                Response = response;
+                                CanClose = true;
+                            });
+            }
+
             Responses = commands;
 
             Icon = StockUserErrorIcon.Notice;
@@ -44,13 +44,7 @@ namespace ReactiveDialog.Implementations
 
         public IEnumerable<RecoveryCommand> Responses { get; private set; }
 
-        public string Message
-        {
-            get
-            {
-                return _message;
-            }
-        }
+        public string Message { get; private set; }
 
         public string Caption
         {

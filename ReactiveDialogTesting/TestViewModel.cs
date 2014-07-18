@@ -43,22 +43,22 @@ namespace WpfApplication3
             _sayHelloCommand = ReactiveCommand.CreateCombined(new IReactiveCommand[]{changeTime, asyncHelloCommand});
 
             _showDialogCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.Hello, s => !string.IsNullOrWhiteSpace(s)));
-
-            var dialog2Command = ReactiveCommand.CreateAsyncObservable(o =>
-                                                                       {
-                                                                           if (o is Answer)
-                                                                           {
-                                                                               return Observable.Return((Answer)o);
-                                                                           }
-                                                                           return Observable.Empty<Answer>();
-                                                                       });
-
-            dialog2Command
-                .Where(a => a == Answer.Ok)
-                .Subscribe(o =>
-                           {
-                               throw new Exception("AAAAAAAAA");
-                           });
+//
+//            var dialog2Command = ReactiveCommand.CreateAsyncObservable(o =>
+//                                                                       {
+//                                                                           if (o is Answer)
+//                                                                           {
+//                                                                               return Observable.Return((Answer)o);
+//                                                                           }
+//                                                                           return Observable.Empty<Answer>();
+//                                                                       });
+//
+//            dialog2Command
+//                .Where(a => a == Answer.Ok)
+//                .Subscribe(o =>
+//                           {
+//                               throw new Exception("AAAAAAAAA");
+//                           });
 
             //            _showDialogCommand.Subscribe(x =>
             //                                         {
@@ -90,7 +90,7 @@ namespace WpfApplication3
 
             _showDialogCommand.ThrownExceptions
                               .Subscribe(ex => _dialogService.ShowException(ex, "message"));
-
+            
             _counter = new ObservableAsPropertyHelper<int>(Observable.Generate(0, i => true, i => i + 1, i => i, i => TimeSpan.FromSeconds(.01)),
                                                            i => this.RaisePropertyChanged("Counter"));
         }
