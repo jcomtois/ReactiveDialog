@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Media;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -62,34 +63,41 @@ namespace ReactiveDialog.Implementations.View
             this.WhenAnyValue(t => t.ViewModel.Responses)
                 .BindTo(this, t => t.ItemsControlResponses.ItemsSource);
 
-            this.WhenAnyValue(t => t.ViewModel)
-                .Subscribe(vm =>
+            this.WhenAnyValue(t => t.ViewModel.Responses)
+                .SelectMany(r => r.Select(c => c))
+                .Merge()
+                .Subscribe(_ => Close());
+
+            this.WhenAnyValue(t => t.ViewModel.CanClose)
+                .Subscribe(b =>
                            {
-                               if (vm == null)
-                               {
-                                   _canClose = true;
-                                   return;
-                               }
+                               _canClose = b;
+                           });
 
-                               foreach (var c in vm.Responses)
+            this.WhenAnyValue(t => t.ViewModel.Message,
+                              t => t.FontSize,
+                              (s, z) => new {message = s, fontsize = z}
+                )
+                .Subscribe(a =>
+                           {
+                               if (a.message.Length < 100)
                                {
-                                   c.Subscribe(_ => Close());
-                               }
-
-                               var canCloseChanged = vm.WhenAnyValue(v => v.CanClose);
-                               canCloseChanged.Subscribe(b =>
-                                                         {
-                                                             _canClose = b;
-                                                         });
-
-                               if (vm.Message.Length < 100)
-                               {
-                                   TextScale = FontSize * 1.5d;
+                                   TextScale = a.fontsize * 1.5d;
                                }
                                else
                                {
                                    ClearValue(TextScaleProperty);
                                }
+                           });
+
+            this.WhenAnyValue(t => t.ViewModel)
+                .Subscribe(vm =>
+                           {
+                               if (vm != null)
+                               {
+                                   return;
+                               }
+                               _canClose = true;
                            });
         }
 

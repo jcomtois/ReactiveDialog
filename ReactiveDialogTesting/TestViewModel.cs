@@ -90,9 +90,9 @@ namespace WpfApplication3
 
             _showDialogCommand.ThrownExceptions
                               .Subscribe(ex => _dialogService.ShowException(ex, "message"));
-            
-            _counter = new ObservableAsPropertyHelper<int>(Observable.Generate(0, i => true, i => i + 1, i => i, i => TimeSpan.FromSeconds(.01)),
-                                                           i => this.RaisePropertyChanged("Counter"));
+
+            _counter = Observable.Generate(0, i => true, i => i + 1, i => i, i => TimeSpan.FromSeconds(.01))
+                                 .ToProperty(this, t => t.Counter);
         }
 
         public IReactiveCommand<object> ShowDialogCommand
